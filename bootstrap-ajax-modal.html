@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ajax + Bootstrap Modal (University Demo)</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      #ajaxContent td,
+      #ajaxContent th {
+        padding: 6px;
+        border-bottom: 1px solid #ddd;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container mt-4">
+      <h1>Ajax + Bootstrap Modal Demo</h1>
+
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Load Universities
+      </button>
+
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Available Universities</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+              <table id="ajaxContent" class="table table-striped table-sm"></table>
+              <div id="errorMessage" class="text-danger mt-2"></div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      const modal = document.getElementById('exampleModal');
+
+      // Change to your actual university JSON endpoint
+      const UNIVERSITY_API_URL = 'https://mi-linux.wlv.ac.uk/~2449474/ajax/ajax.php';
+
+      modal.addEventListener('show.bs.modal', () => {
+        const table    = document.getElementById("ajaxContent");
+        const errorMsg = document.getElementById("errorMessage");
+        const title    = document.getElementById("exampleModalLabel");
+
+        // Reset UI
+        table.innerHTML = `
+          <tr>
+            <td class="text-center">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </td>
+          </tr>
+        `;
+        errorMsg.textContent = "";
+        title.textContent = "Available Universities";
+
+        fetch(UNIVERSITY_API_URL)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Network error");
+            }
+            return response.json();
+          })
+          .then(data => {
+            table.innerHTML = "";
+
+            if (!Array.isArray(data) || data.length === 0) {
+              table.innerHTML = "<tr><td><em>No universities found.</em></td></tr>";
+              return;
+            }
+
+            // Table header
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+              <tr>
+                <th>University Name</th>
+              </tr>
+            `;
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+
+            data.forEach(university => {
+              const row = document.createElement('tr');
+              const cell = document.createElement('td');
+
+              // Use correct JSON field from your backend
+              cell.textContent = university.university_name ?? '(Unnamed University)';
+
+              row.appendChild(cell);
+              tbody.appendChild(row);
+            });
+
+            table.appendChild(tbody);
+
+            title.textContent = "Available Universities (" + data.length + ")";
+          })
+          .catch(() => {
+            table.innerHTML = "";
+            errorMsg.textContent = "Error loading university data. Please try again.";
+          });
+      });
+    </script>
+
+  </body>
+</html>
