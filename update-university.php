@@ -9,7 +9,7 @@ $rating = $_POST['rating'];
 $established_date = $_POST['established_date'];
 
 // Update query
-$sql = "UPDATE University 
+$sql = "UPDATE University
         SET university_name='$university_name',
             university_description='$university_description',
             rating='$rating',
