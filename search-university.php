@@ -8,7 +8,7 @@
   $keywords = $_POST['keywords'];  
 
   // Run SQL query
-  $sql = "SELECT * FROM university 
+  $sql = "SELECT * FROM university
           WHERE university_name LIKE '%{$keywords}%' 
           ORDER BY established_date";
           
